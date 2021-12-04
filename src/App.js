@@ -1,5 +1,7 @@
+import { SpeedDial } from "@mui/material";
 import React from "react";
 import { BrowserRouter as Router, Routes , Route, Link } from "react-router-dom";
+import projectSpeedDials from './pages/projectSpeedDials'
 
 // This site has 3 pages, all of which are rendered
 // dynamically in the browser (not server rendered).
@@ -40,7 +42,7 @@ export default function BasicExample() {
             <Home />
           </Route>
           <Route path="/speeddial">
-            <About />
+            <projectSpeedDials/>
           </Route>
           <Route path="/dashboard">
             <Dashboard />
