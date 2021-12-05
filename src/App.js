@@ -1,7 +1,12 @@
-import { SpeedDial } from "@mui/material";
-import React from "react";
-import { BrowserRouter as Router, Routes , Route, Link } from "react-router-dom";
-import projectSpeedDials from './pages/projectSpeedDials'
+import * as React from "react";
+import IconButton from "@mui/material/IconButton";
+import Box from "@mui/material/Box";
+import { useTheme, ThemeProvider, createTheme } from "@mui/material/styles";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import GridTemplateColumns from "./pages/projectSpeedDials";
+import ResponsiveAppBar from "./pages/responsiveAppBar";
 
 // This site has 3 pages, all of which are rendered
 // dynamically in the browser (not server rendered).
@@ -11,47 +16,6 @@ import projectSpeedDials from './pages/projectSpeedDials'
 // through the site. This preserves the browser history,
 // making sure things like the back button and bookmarks
 // work properly.
-
-export default function BasicExample() {
-  return (
-    <Router>
-      <div>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/about">About</Link>
-          </li>
-          <li>
-            <Link to="/dashboard">Dashboard</Link>
-          </li>
-        </ul>
-
-        <hr />
-
-        {/*
-          A <Switch> looks through all its children <Route>
-          elements and renders the first one whose path
-          matches the current URL. Use a <Switch> any time
-          you have multiple routes, but you want only one
-          of them to render at a time
-        */}
-        <Routes>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route path="/speeddial">
-            <projectSpeedDials/>
-          </Route>
-          <Route path="/dashboard">
-            <Dashboard />
-          </Route>
-        </Routes>
-      </div>
-    </Router>
-  );
-}
 
 // You can think of these components as "pages"
 // in your app.
@@ -64,18 +28,104 @@ function Home() {
   );
 }
 
-function About() {
+export const light = {
+  palette: {
+    type: "light",
+  },
+};
+export const dark = {
+  palette: {
+    type: "dark",
+  },
+};
+
+const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
+
+function MyApp() {
+  const theme = useTheme();
+  const colorMode = React.useContext(ColorModeContext);
   return (
-    <div>
-      <h2>About</h2>
-    </div>
+    <Box
+      sx={{
+        display: "flex",
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+        bgcolor: "background.default",
+        color: "text.primary",
+        borderRadius: 1,
+        p: 3,
+      }}
+    >
+      {theme.palette.mode} mode
+      <IconButton
+        sx={{ ml: 1 }}
+        onClick={colorMode.toggleColorMode}
+        color="inherit"
+      >
+        {theme.palette.mode === "dark" ? (
+          <Brightness7Icon />
+        ) : (
+          <Brightness4Icon />
+        )}
+      </IconButton>
+    </Box>
   );
 }
 
-function Dashboard() {
+export default function ToggleColorMode() {
+  const [mode, setMode] = React.useState("light");
+  const colorMode = React.useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+      },
+    }),
+    []
+  );
+
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode,
+        },
+      }),
+    [mode]
+  );
+
   return (
-    <div>
-      <h2>Dashboard</h2>
-    </div>
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <Router>
+        <ResponsiveAppBar />
+          <div>
+            <ul>
+              <li>
+                <Link to="/">Home</Link>
+              </li>
+              <li>
+                <Link to="/speeddial">SpeedDial</Link>
+              </li>
+            </ul>
+
+            <hr />
+
+            {/*
+          A <Switch> looks through all its children <Route>
+          elements and renders the first one whose path
+          matches the current URL. Use a <Switch> any time
+          you have multiple routes, but you want only one
+          of them to render at a time
+        */}
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/speeddial" element={<GridTemplateColumns />} />
+            </Routes>
+          </div>
+        </Router>
+        
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
